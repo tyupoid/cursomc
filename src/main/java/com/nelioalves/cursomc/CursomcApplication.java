@@ -9,11 +9,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.nelioalves.cursomc.domain.Categoria;
 import com.nelioalves.cursomc.domain.Cidade;
+import com.nelioalves.cursomc.domain.Cliente;
 import com.nelioalves.cursomc.domain.Endereco;
 import com.nelioalves.cursomc.domain.Estado;
 import com.nelioalves.cursomc.domain.Produto;
+import com.nelioalves.cursomc.domain.enums.TipoCliente;
 import com.nelioalves.cursomc.repositories.CategoriaRepository;
 import com.nelioalves.cursomc.repositories.CidadeRepository;
+import com.nelioalves.cursomc.repositories.ClienteRepository;
 import com.nelioalves.cursomc.repositories.EnderecoRepository;
 import com.nelioalves.cursomc.repositories.EstadoRepository;
 import com.nelioalves.cursomc.repositories.ProdutoRepository;
@@ -31,6 +34,9 @@ public class CursomcApplication implements CommandLineRunner {
 	
 	@Autowired
 	CidadeRepository cidadeRepository;
+	
+	@Autowired 
+	ClienteRepository clienteRepository; 
 	
 	@Autowired
 	EnderecoRepository enderecoRepository;
@@ -76,15 +82,19 @@ public class CursomcApplication implements CommandLineRunner {
 		estadoRepository.saveAll(Arrays.asList(estado1,estado2));
 		cidadeRepository.saveAll(Arrays.asList(cidade1,cidade2,cidade3));
 		
-		//       --------------------------------------
+	
+		Cliente cliente1 = new Cliente(null,"maria silva","maria@gmail.com","36378912377",TipoCliente.PessoaFisica);
+		cliente1.getTelefones().addAll(Arrays.asList("27363323","93838393"));
 		
-		//Endereco endereco1 = new Endereco(null,"rua flores","300","apto 203","jardim","38220834",cidade1);
-		//Endereco endereco2 = new Endereco(null,"rua Avenida Matos","105","sala 800","centro","38777012",cidade2);
+		Endereco endereco1 = new Endereco(null,"rua flores","300","apto 203","jardim","38220834",cliente1,cidade1);
+		Endereco endereco2 = new Endereco(null,"Avenida matos","105","sala 800","centro","38777012",cliente1,cidade2);
 		
-		//endereco1.adicionarCidade(cidade1);
-		//endereco2.adicionarCidade(cidade2);
+		cliente1.getEnderecos().addAll(Arrays.asList(endereco1,endereco2));
 		
-		//enderecoRepository.saveAll(Arrays.asList(endereco1,endereco2));
+		clienteRepository.save(cliente1);
+		enderecoRepository.saveAll(Arrays.asList(endereco1,endereco2));
 	}
+	
+	
 
 }

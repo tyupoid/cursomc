@@ -6,7 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import com.nelioalves.cursomc.domain.enums.TipoCliente;
 
@@ -16,14 +22,20 @@ public class Cliente implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String nome;
 	private String email;
 	private String cpfOuCnpj;
 	private Integer tipo;
 	
+	@OneToMany(mappedBy = "cliente")
 	private List<Endereco> enderecos = new ArrayList<>();
-	private Set<Telefone> telefones = new HashSet<>();
+	
+	@ElementCollection
+	@CollectionTable(name = "telefone")
+	private Set<String> telefones = new HashSet<>();
 	public Cliente() {
 	}
 	public Cliente(Integer id, String nome, String email, String cpfOuCnpj, TipoCliente tipo) {
@@ -69,11 +81,13 @@ public class Cliente implements Serializable {
 	public void adicionarEndereco(Endereco endereco) {
 		enderecos.add(endereco);
 	}
-	public Set<Telefone> getTelefones() {
+	
+	
+	public Set<String> getTelefones() {
 		return telefones;
 	}
-	public void adicionarTelefone(Telefone  telefone) {
-		telefones.add(telefone);
+	public void adicionarTelefone(Set<String> telefones) {
+		this.telefones = telefones;
 	}
 	@Override
 	public int hashCode() {
