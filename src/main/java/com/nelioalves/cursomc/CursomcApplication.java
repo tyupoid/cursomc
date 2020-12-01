@@ -13,6 +13,7 @@ import com.nelioalves.cursomc.domain.Cidade;
 import com.nelioalves.cursomc.domain.Cliente;
 import com.nelioalves.cursomc.domain.Endereco;
 import com.nelioalves.cursomc.domain.Estado;
+import com.nelioalves.cursomc.domain.ItemPedido;
 import com.nelioalves.cursomc.domain.Pagamento;
 import com.nelioalves.cursomc.domain.PagamentoComBoleto;
 import com.nelioalves.cursomc.domain.PagamentoComCartao;
@@ -25,6 +26,7 @@ import com.nelioalves.cursomc.repositories.CidadeRepository;
 import com.nelioalves.cursomc.repositories.ClienteRepository;
 import com.nelioalves.cursomc.repositories.EnderecoRepository;
 import com.nelioalves.cursomc.repositories.EstadoRepository;
+import com.nelioalves.cursomc.repositories.ItemPedidoRepository;
 import com.nelioalves.cursomc.repositories.PagamentoRepository;
 import com.nelioalves.cursomc.repositories.PedidoRepository;
 import com.nelioalves.cursomc.repositories.ProdutoRepository;
@@ -48,13 +50,16 @@ public class CursomcApplication implements CommandLineRunner {
 
 	@Autowired
 	EnderecoRepository enderecoRepository;
-	
+
 	@Autowired
 	PedidoRepository pedidoRepository;
-	
+
 	@Autowired
 	PagamentoRepository pagamentoRepository;
 
+	@Autowired
+	ItemPedidoRepository itemPedidoRepository;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
 	}
@@ -113,16 +118,32 @@ public class CursomcApplication implements CommandLineRunner {
 		Pedido pedido1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cliente1, endereco1);
 		Pedido pedido2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cliente1, endereco2);
 
-		Pagamento pagamentoComCartao = new PagamentoComCartao(null,EstadoPagamento.QUITADO,pedido1,6);
+		Pagamento pagamentoComCartao = new PagamentoComCartao(null, EstadoPagamento.QUITADO, pedido1, 6);
 		pedido1.setPagamento(pagamentoComCartao);
-		
-		Pagamento pagamentoComBoleto = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, pedido2,sdf.parse("20/10/2017 00:00"),null);
+
+		Pagamento pagamentoComBoleto = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, pedido2,
+				sdf.parse("20/10/2017 00:00"), null);
 		pedido2.setPagamento(pagamentoComBoleto);
+
+		cliente1.getPedidos().addAll(Arrays.asList(pedido1, pedido2));
+
+		pedidoRepository.saveAll(Arrays.asList(pedido1, pedido2));
+		pagamentoRepository.saveAll(Arrays.asList(pagamentoComBoleto, pagamentoComCartao));
+
+		// ------------------------
+
+		ItemPedido itemPedido1 = new ItemPedido(pedido1, produto1, 0.00, 1, 2000.00);
+		ItemPedido itemPedido2 = new ItemPedido(pedido1, produto3, 0.00, 2, 80.00);
+		ItemPedido itemPedido3 = new ItemPedido(pedido2, produto2, 100.00, 1, 800.00);
+
+		pedido1.getItems().addAll(Arrays.asList(itemPedido1, itemPedido2));
+		pedido2.getItems().add(itemPedido3);
+
+		produto1.getItems().add(itemPedido1);
+		produto2.getItems().add(itemPedido3);
+		produto3.getItems().add(itemPedido2);
 		
-		cliente1.getPedidos().addAll(Arrays.asList(pedido1,pedido2));
-		
-		pedidoRepository.saveAll(Arrays.asList(pedido1,pedido2));
-		pagamentoRepository.saveAll(Arrays.asList(pagamentoComBoleto,pagamentoComCartao));
-				
+		itemPedidoRepository.saveAll(Arrays.asList(itemPedido1,itemPedido2,itemPedido3));
+
 	}
 }
